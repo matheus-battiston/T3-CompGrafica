@@ -76,9 +76,17 @@ def loadTexture():
 
         return textures
 
+def cilindro():
+    quadric = gluNewQuadric()
+    glTranslated(-19,2,0)
+    glRotatef(90, 1, 0, 0)
+    gluCylinder(quadric, 0.2, 0.2, 2, 5, 5);
+
 def desenha_canhao():
-    glTranslated(-20,-0.5,0)
+    glPushMatrix()
+    glTranslated(-19,-0.5,0)
     glRotatef(90, 0, 1, 0)
+
     glBegin(GL_QUADS);
     glVertex3f(-1, -0.5, 1.5);
     glVertex3f(1, -0.5, 1.5);
@@ -110,6 +118,7 @@ def desenha_canhao():
     glVertex3f(-1, 0.5, 1.5);
     glVertex3f(-1, 0.5, -1.5);
     glEnd();
+    glPopMatrix()
 
 
 #  reshape( w: int, h: int )
@@ -312,13 +321,15 @@ def display():
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
     DefineLuz()
     PosicUser()
+    DesenhaPiso()
+
+
 
     glMatrixMode(GL_MODELVIEW)
-
-
-    DesenhaPiso()
     desenhap()
     desenha_canhao()
+    cilindro()
+
 
     Angulo += 1
     glutSwapBuffers()
