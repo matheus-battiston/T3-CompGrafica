@@ -7,30 +7,75 @@
 # Marcio Sarroglia Pinho
 # pinho@inf.pucrs.br
 # **********************************************************************
+import numpy as np
 from OpenGL.GL import *
 from OpenGL.GLUT import *
 from OpenGL.GLU import *
 from Ponto import Ponto
 from Linha import Linha
 import time
-
+import sys
+from PIL import Image
 Angulo = 0.0
 
-
+textura = None
 # **********************************************************************
 #  init()
 #  Inicializa os parÃ¢metros globais de OpenGL
 # / **********************************************************************
 def init():
+    global textura
     # Define a cor do fundo da tela (BRANCO)
     glClearColor(0.5, 0.5, 0.5, 1.0)
 
     glEnable(GL_DEPTH_TEST)
     glEnable(GL_CULL_FACE)
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
+    glEnable(GL_TEXTURE_2D);
+    textura = loadTexture()
+
+texture_num = 2
+textures = [1001, 1011]
+def loadTexture():
+        global texture_num, textures
+        glEnable(GL_TEXTURE_2D);
+        glGenTextures(2, textures)
+        level = 0
+        border = 0
+
+        # Create Texture
+        glBindTexture(GL_TEXTURE_2D, int(textures[0]))  # 2d texture (x and y size)
+
+        image = Image.open("grassy_d.png")
+
+        ix = image.size[0]
+        iy = image.size[1]
+        img_data = np.array(list(image.getdata()), np.int8)
+        formato = GL_RGB
+        glPixelStorei(GL_UNPACK_ALIGNMENT, 1)
+        glTexImage2D(GL_TEXTURE_2D, level, formato,ix, iy,border, formato,GL_UNSIGNED_BYTE,img_data);
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+        glBindTexture(GL_TEXTURE_2D, int(textures[1]))  # 2d texture (x and y size)
+
+        image = Image.open("TIjolo.jpg")
+
+        ix = image.size[0]
+        iy = image.size[1]
+        img_data = np.array(list(image.getdata()), np.int8)
+        formato = GL_RGB
+        glPixelStorei(GL_UNPACK_ALIGNMENT, 1)
+        glTexImage2D(GL_TEXTURE_2D, level, formato, ix, iy, border, formato, GL_UNSIGNED_BYTE, img_data);
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 
-# **********************************************************************
+
+        return textures
+
 #  reshape( w: int, h: int )
 #  trata o redimensionamento da janela OpenGL
 #
@@ -95,10 +140,22 @@ def DefineLuz():
 #
 # **********************************************************************
 def DesenhaCubo():
+
     glutSolidCube(1)
 
-
+userx = -23
+usery = 0
+userz = 0
+lookx = 0
+looky = 0
+lookz = 0
 def PosicUser():
+    global userx
+    global usery
+    global userz
+    global lookx
+    global looky
+    global lookz
     glMatrixMode(GL_PROJECTION)
     glLoadIdentity()
     # print ("AspectRatio", AspectRatio)
@@ -106,7 +163,7 @@ def PosicUser():
 
     glMatrixMode(GL_MODELVIEW)
     glLoadIdentity()
-    gluLookAt(0, 4, 10, 0, 0, 0, 0, 1.0, 0.0)
+    gluLookAt(userx, usery, userz, lookx, looky, lookz, 0, 1.0, 0.0)
 
 
 # **********************************************************************
@@ -115,71 +172,113 @@ def PosicUser():
 # O ladrilho tem largula 1, centro no (0,0,0) e estÃ¡ sobre o plano XZ
 # **********************************************************************
 def DesenhaLadrilho():
-    glColor3f(0, 0, 1)  # desenha QUAD preenchido
+    global textura
+    glBindTexture(GL_TEXTURE_2D, 1001);
     glBegin(GL_QUADS)
     glNormal3f(0, 1, 0)
+    glTexCoord2f(0.0, 0.0)
     glVertex3f(-0.5, 0.0, -0.5)
+    glTexCoord2f(1.0, 0.0)
+
     glVertex3f(-0.5, 0.0, 0.5)
+    glTexCoord2f(1.0, 1.0)
+
     glVertex3f(0.5, 0.0, 0.5)
+    glTexCoord2f(1.0, 0.0)
+
     glVertex3f(0.5, 0.0, -0.5)
     glEnd()
 
     glColor3f(1, 1, 1)  # desenha a borda da QUAD
     glBegin(GL_LINE_STRIP)
     glNormal3f(0, 1, 0)
+    glTexCoord2f(0.0, 0.0)
+
     glVertex3f(-0.5, 0.0, -0.5)
+    glTexCoord2f(0.0, 0.0)
+
     glVertex3f(-0.5, 0.0, 0.5)
+    glTexCoord2f(0.0, 0.0)
+
     glVertex3f(0.5, 0.0, 0.5)
+    glTexCoord2f(1.0, 0.0)
+
     glVertex3f(0.5, 0.0, -0.5)
     glEnd()
-
 
 # **********************************************************************
 def DesenhaPiso():
     glPushMatrix()
     glTranslated(-20, -1, -10)
-    for x in range(-20, 20):
+    for x in range(-24, 24):
         glPushMatrix()
-        for z in range(-20, 20):
+        for z in range(-12, 12):
             DesenhaLadrilho()
             glTranslated(0, 0, 1)
         glPopMatrix()
         glTranslated(1, 0, 0)
     glPopMatrix()
 
+def desenhap():
+    glPushMatrix()
+    glTranslated(0, -1, -10)
+    for x in range(0, 15):
+        glPushMatrix()
+        for z in range(-12, 12):
+            DesenhaParedao()
+            glTranslated(0, 0, 1)
+        glPopMatrix()
+        glTranslated(0, 1, 0)
+    glPopMatrix()
+
+def DesenhaParedao():
+    glBindTexture(GL_TEXTURE_2D, 1011);
+
+    glBegin(GL_QUADS);
+    glTexCoord2f(0.0, 0.0); glVertex3f(-0.5, -0.5, 0.5);
+    glTexCoord2f(1.0, 0.0); glVertex3f(0.5, -0.5, 0.5);
+    glTexCoord2f(1.0, 1.0); glVertex3f(0.5, 0.5, 0.5);
+    glTexCoord2f(0.0, 1.0); glVertex3f(-0.5, 0.5, 0.5);
+    glTexCoord2f(1.0, 0.0); glVertex3f(-0.5, -0.5, -0.5);
+    glTexCoord2f(1.0, 1.0); glVertex3f(-0.5, 0.5, -0.5);
+    glTexCoord2f(0.0, 1.0); glVertex3f(0.5, 0.5, -0.5);
+    glTexCoord2f(0.0, 0.0); glVertex3f(0.5, -0.5, -0.5);
+    glTexCoord2f(0.0, 1.0); glVertex3f(-0.5, 0.5, -0.5);
+    glTexCoord2f(0.0, 0.0); glVertex3f(-0.5, 0.5, 0.5);
+    glTexCoord2f(1.0, 0.0); glVertex3f(0.5, 0.5, 0.5);
+    glTexCoord2f(1.0, 1.0); glVertex3f(0.5, 0.5, -0.5);
+    glTexCoord2f(1.0, 1.0); glVertex3f(-0.5, -0.5, -0.5);
+    glTexCoord2f(0.0, 1.0); glVertex3f(0.5, -0.5, -0.5);
+    glTexCoord2f(0.0, 0.0); glVertex3f(0.5, -0.5, 0.5);
+    glTexCoord2f(1.0, 0.0); glVertex3f(-0.5, -0.5, 0.5);
+    glTexCoord2f(1.0, 0.0); glVertex3f(0.5, -0.5, -0.5);
+    glTexCoord2f(1.0, 1.0); glVertex3f(0.5, 0.5, -0.5);
+    glTexCoord2f(0.0, 1.0); glVertex3f(0.5, 0.5, 0.5);
+    glTexCoord2f(0.0, 0.0); glVertex3f(0.5, -0.5, 0.5);
+    glTexCoord2f(0.0, 0.0); glVertex3f(-0.5, -0.5, -0.5);
+    glTexCoord2f(1.0, 0.0); glVertex3f(-0.5, -0.5, 0.5);
+    glTexCoord2f(1.0, 1.0); glVertex3f(-0.5, 0.5, 0.5);
+    glTexCoord2f(0.0, 1.0); glVertex3f(-0.5, 0.5, -0.5);
+    glEnd();
 
 # **********************************************************************
 # display()
-# Funcao que exibe os desenhos na tela
-#
+# Funcao que exibe os desenhos na tela#
 # **********************************************************************
 def display():
     global Angulo
     # Limpa a tela com  a cor de fundo
-    glClear(GL_COLOR_BUFFER_BIT)
-
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
     DefineLuz()
     PosicUser()
 
     glMatrixMode(GL_MODELVIEW)
 
+
     DesenhaPiso()
-    glColor3f(0.5, 0.0, 0.0)  # Vermelho
-    glPushMatrix()
-    glTranslatef(-2, 0, 0)
-    glRotatef(Angulo, 0, 1, 0)
-    DesenhaCubo()
-    glPopMatrix()
+    desenhap()
 
-    glColor3f(0.5, 0.5, 0.0)  # Amarelo
-    glPushMatrix()
-    glTranslatef(2, 0, 0)
-    glRotatef(-Angulo, 0, 1, 0)
-    DesenhaCubo()
-    glPopMatrix()
-
-    Angulo = Angulo + 1
-
+    Angulo += 1
     glutSwapBuffers()
 
 
@@ -236,14 +335,26 @@ def keyboard(*args):
 # **********************************************************************
 
 def arrow_keys(a_keys: int, x: int, y: int):
+    global userx
+    global userz
+    global usery
+    global lookx
+    global looky
+    global lookz
     if a_keys == GLUT_KEY_UP:  # Se pressionar UP
-        pass
+        userx += 1
+        lookx += 1
+
     if a_keys == GLUT_KEY_DOWN:  # Se pressionar DOWN
-        pass
+        userx -=1
+        lookx -=1
     if a_keys == GLUT_KEY_LEFT:  # Se pressionar LEFT
-        pass
+        userz-=1
+        lookz -=1
+
     if a_keys == GLUT_KEY_RIGHT:  # Se pressionar RIGHT
-        pass
+        userz +=1
+        lookz +=1
 
     glutPostRedisplay()
 
