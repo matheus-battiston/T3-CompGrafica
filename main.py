@@ -46,7 +46,7 @@ def loadTexture():
         # Create Texture
         glBindTexture(GL_TEXTURE_2D, int(textures[0]))  # 2d texture (x and y size)
 
-        image = Image.open("grassy_d.png")
+        image = Image.open("grama.tga")
 
         ix = image.size[0]
         iy = image.size[1]
@@ -60,7 +60,7 @@ def loadTexture():
 
         glBindTexture(GL_TEXTURE_2D, int(textures[1]))  # 2d texture (x and y size)
 
-        image = Image.open("TIjolo.jpg")
+        image = Image.open('tijoleira.jpg')
 
         ix = image.size[0]
         iy = image.size[1]
@@ -75,6 +75,42 @@ def loadTexture():
 
 
         return textures
+
+def desenha_canhao():
+    glTranslated(-20,-0.5,0)
+    glRotatef(90, 0, 1, 0)
+    glBegin(GL_QUADS);
+    glVertex3f(-1, -0.5, 1.5);
+    glVertex3f(1, -0.5, 1.5);
+    glVertex3f(1, 0.5, 1.5);
+    glVertex3f(-1, 0.5, 1.5);
+
+    glVertex3f(-1, -0.5, -1.5);
+    glVertex3f(-1, 0.5, -1.5);
+    glVertex3f(1, 0.5, -1.5);
+    glVertex3f(1, -0.5, -1.5);
+
+    glVertex3f(-1, 0.5, -1.5);
+    glVertex3f(-1, 0.5, 1.5);
+    glVertex3f(1, 0.5, 1.5);
+    glVertex3f(1, 0.5, -1.5);
+
+    glVertex3f(-1, -0.5, -1.5);
+    glVertex3f(1, -0.5, -1.5);
+    glVertex3f(1, -0.5, 1.5);
+    glVertex3f(-1, -0.5, 1.5);
+
+    glVertex3f(1, -0.5, -1.5);
+    glVertex3f(1, 0.5, -1.5);
+    glVertex3f(1, 0.5, 1.5);
+    glVertex3f(1, -0.5, 1.5);
+
+    glVertex3f(-1, -0.5, -1.5);
+    glVertex3f(-1, -0.5, 1.5);
+    glVertex3f(-1, 0.5, 1.5);
+    glVertex3f(-1, 0.5, -1.5);
+    glEnd();
+
 
 #  reshape( w: int, h: int )
 #  trata o redimensionamento da janela OpenGL
@@ -221,7 +257,7 @@ def DesenhaPiso():
 
 def desenhap():
     glPushMatrix()
-    glTranslated(0, -1, -10)
+    glTranslated(0, -0.5, -10)
     for x in range(0, 15):
         glPushMatrix()
         for z in range(-12, 12):
@@ -239,22 +275,27 @@ def DesenhaParedao():
     glTexCoord2f(1.0, 0.0); glVertex3f(0.5, -0.5, 0.5);
     glTexCoord2f(1.0, 1.0); glVertex3f(0.5, 0.5, 0.5);
     glTexCoord2f(0.0, 1.0); glVertex3f(-0.5, 0.5, 0.5);
+
     glTexCoord2f(1.0, 0.0); glVertex3f(-0.5, -0.5, -0.5);
     glTexCoord2f(1.0, 1.0); glVertex3f(-0.5, 0.5, -0.5);
     glTexCoord2f(0.0, 1.0); glVertex3f(0.5, 0.5, -0.5);
     glTexCoord2f(0.0, 0.0); glVertex3f(0.5, -0.5, -0.5);
+
     glTexCoord2f(0.0, 1.0); glVertex3f(-0.5, 0.5, -0.5);
     glTexCoord2f(0.0, 0.0); glVertex3f(-0.5, 0.5, 0.5);
     glTexCoord2f(1.0, 0.0); glVertex3f(0.5, 0.5, 0.5);
     glTexCoord2f(1.0, 1.0); glVertex3f(0.5, 0.5, -0.5);
+
     glTexCoord2f(1.0, 1.0); glVertex3f(-0.5, -0.5, -0.5);
     glTexCoord2f(0.0, 1.0); glVertex3f(0.5, -0.5, -0.5);
     glTexCoord2f(0.0, 0.0); glVertex3f(0.5, -0.5, 0.5);
     glTexCoord2f(1.0, 0.0); glVertex3f(-0.5, -0.5, 0.5);
+
     glTexCoord2f(1.0, 0.0); glVertex3f(0.5, -0.5, -0.5);
     glTexCoord2f(1.0, 1.0); glVertex3f(0.5, 0.5, -0.5);
     glTexCoord2f(0.0, 1.0); glVertex3f(0.5, 0.5, 0.5);
     glTexCoord2f(0.0, 0.0); glVertex3f(0.5, -0.5, 0.5);
+
     glTexCoord2f(0.0, 0.0); glVertex3f(-0.5, -0.5, -0.5);
     glTexCoord2f(1.0, 0.0); glVertex3f(-0.5, -0.5, 0.5);
     glTexCoord2f(1.0, 1.0); glVertex3f(-0.5, 0.5, 0.5);
@@ -277,6 +318,7 @@ def display():
 
     DesenhaPiso()
     desenhap()
+    desenha_canhao()
 
     Angulo += 1
     glutSwapBuffers()
