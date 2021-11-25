@@ -17,8 +17,12 @@ import time
 import sys
 from PIL import Image
 Angulo = 0.0
-
+angulo = 0
+angulo2 = 0
+posx = -19
+posz = 0
 textura = None
+rota_paralelepipedo = 0
 # **********************************************************************
 #  init()
 #  Inicializa os parÃ¢metros globais de OpenGL
@@ -46,7 +50,7 @@ def loadTexture():
         # Create Texture
         glBindTexture(GL_TEXTURE_2D, int(textures[0]))  # 2d texture (x and y size)
 
-        image = Image.open("grama.tga")
+        image = Image.open("grassy_d.png")
 
         ix = image.size[0]
         iy = image.size[1]
@@ -60,7 +64,7 @@ def loadTexture():
 
         glBindTexture(GL_TEXTURE_2D, int(textures[1]))  # 2d texture (x and y size)
 
-        image = Image.open('tijoleira.jpg')
+        image = Image.open('TIjolo_med.jpg')
 
         ix = image.size[0]
         iy = image.size[1]
@@ -76,16 +80,25 @@ def loadTexture():
 
         return textures
 
+
 def cilindro():
+    global angulo,angulo2,posx,posz,rota_paralelepipedo
     quadric = gluNewQuadric()
-    glTranslated(-19,2,0)
-    glRotatef(90, 1, 0, 0)
+    glPushMatrix()
+    glTranslated(posx-1,-0.2,posz)
+    glRotatef(90+angulo+rota_paralelepipedo,0,1,0)
+    glRotatef(-20+angulo2,1,0,0)
     gluCylinder(quadric, 0.2, 0.2, 2, 5, 5);
 
+    glPopMatrix()
+
 def desenha_canhao():
+    global angulo
+    global posx,posz
+    global rota_paralelepipedo
     glPushMatrix()
-    glTranslated(-19,-0.5,0)
-    glRotatef(90, 0, 1, 0)
+    glTranslated(posx,-0.5,posz)
+    glRotatef(90+rota_paralelepipedo, 0, 1, 0)
 
     glBegin(GL_QUADS);
     glVertex3f(-1, -0.5, 1.5);
@@ -208,7 +221,7 @@ def PosicUser():
 
     glMatrixMode(GL_MODELVIEW)
     glLoadIdentity()
-    gluLookAt(userx, usery, userz, lookx, looky, lookz, 0, 1.0, 0.0)
+    gluLookAt(userx, 3, userz, lookx, looky, lookz, 0, 1.0, 0.0)
 
 
 # **********************************************************************
@@ -317,20 +330,19 @@ def DesenhaParedao():
 # **********************************************************************
 def display():
     global Angulo
+    global rota_paralelepipedo
     # Limpa a tela com  a cor de fundo
+    print(rota_paralelepipedo)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
     DefineLuz()
     PosicUser()
     DesenhaPiso()
 
-
-
     glMatrixMode(GL_MODELVIEW)
+
     desenhap()
-    desenha_canhao()
     cilindro()
-
-
+    desenha_canhao()
     Angulo += 1
     glutSwapBuffers()
 
@@ -368,8 +380,10 @@ def animate():
 # **********************************************************************
 ESCAPE = b'\x1b'
 
-
 def keyboard(*args):
+    global rota_paralelepipedo
+
+    global angulo,angulo2
     # print (args)
     # If escape is pressed, kill everything.
 
@@ -378,6 +392,43 @@ def keyboard(*args):
 
     if args[0] == b' ':
         init()
+    if args[0] == b'd':
+        if angulo > -60:
+            angulo -= 1
+    if args[0] == b'a':
+        if angulo < 60:
+            angulo += 1
+    if args[0] == b's':
+        if angulo2 < 20:
+
+            angulo2 +=1
+    if args[0] == b'w':
+        if angulo2 > -60:
+            angulo2 -=1
+
+    global posx,posz
+
+    if args[0] == b'i':
+        if posx < -2 and rota_paralelepipedo == 0:
+            posx +=1
+        elif rota_paralelepipedo == 90 and posz >-9:
+            posz-=1
+        elif rota_paralelepipedo == -90 and posz <12:
+            posz+=1
+    if args[0] == b'k':
+        if posx > -19 and rota_paralelepipedo == 0:
+            posx -=1
+        elif rota_paralelepipedo == 90 and posz < 12:
+            posz +=1
+        elif rota_paralelepipedo == -90 and posz > -9:
+            posz -=1
+
+    if args[0] == b'2':
+        rota_paralelepipedo = 0
+    if args[0] == b'1':
+        rota_paralelepipedo = 90
+    if args[0] == b'3':
+        rota_paralelepipedo = -90
 
     # ForÃ§a o redesenho da tela
     glutPostRedisplay()
