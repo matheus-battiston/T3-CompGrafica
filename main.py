@@ -332,7 +332,6 @@ def display():
     global Angulo
     global rota_paralelepipedo
     # Limpa a tela com  a cor de fundo
-    print(rota_paralelepipedo)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
     DefineLuz()
     PosicUser()
