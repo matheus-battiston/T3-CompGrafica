@@ -16,6 +16,8 @@ from Linha import Linha
 import time
 import sys
 from PIL import Image
+
+
 Angulo = 0.0
 angulo = 0
 angulo2 = 0
@@ -50,7 +52,7 @@ def loadTexture():
         # Create Texture
         glBindTexture(GL_TEXTURE_2D, int(textures[0]))  # 2d texture (x and y size)
 
-        image = Image.open("grassy_d.png")
+        image = Image.open("graminha.jpg")
 
         ix = image.size[0]
         iy = image.size[1]
@@ -64,7 +66,7 @@ def loadTexture():
 
         glBindTexture(GL_TEXTURE_2D, int(textures[1]))  # 2d texture (x and y size)
 
-        image = Image.open('TIjolo_med.jpg')
+        image = Image.open('tijoleira.jpg')
 
         ix = image.size[0]
         iy = image.size[1]
@@ -80,12 +82,18 @@ def loadTexture():
 
         return textures
 
+def munição():
+    glPushMatrix()
+    glTranslated(posx,-0.2,posz)
+    glutSolidSphere(0.2,10,10)
+    glPopMatrix()
+
 
 def cilindro():
     global angulo,angulo2,posx,posz,rota_paralelepipedo
     quadric = gluNewQuadric()
     glPushMatrix()
-    glTranslated(posx-1,-0.2,posz)
+    glTranslated(posx,-0.2,posz)
     glRotatef(90+angulo+rota_paralelepipedo,0,1,0)
     glRotatef(-20+angulo2,1,0,0)
     gluCylinder(quadric, 0.2, 0.2, 2, 5, 5);
@@ -328,23 +336,44 @@ def DesenhaParedao():
 # display()
 # Funcao que exibe os desenhos na tela#
 # **********************************************************************
+
+
+anterior = time.time()
+inicio = time.time()
+
+def calc_tempo():
+    global anterior
+
+    agora = time.time()
+    tempo = agora - anterior
+    anterior = agora
+    return tempo
+
+movimento = 0
 def display():
+    global movimento
     global Angulo
     global rota_paralelepipedo
+
+    tempo = calc_tempo()
     # Limpa a tela com  a cor de fundo
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
     DefineLuz()
     PosicUser()
-    DesenhaPiso()
 
     glMatrixMode(GL_MODELVIEW)
+
+    DesenhaPiso()
 
     desenhap()
     cilindro()
     desenha_canhao()
-    Angulo += 1
+    glPushMatrix()
+    glTranslated(movimento,0,0)
+    munição()
+    glPopMatrix()
     glutSwapBuffers()
-
+    movimento += tempo * 10
 
 # **********************************************************************
 # animate()
